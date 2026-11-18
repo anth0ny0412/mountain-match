@@ -93,8 +93,15 @@ def gw_match(idx, name, height):
     return best if abs(float(best["mntninfohght"]) - height) < 30 else None  # 동명이산은 높이로 구분
 
 
+def load_photos():
+    """collect_photos.py 결과(산정보 서비스 이미지, 해상도 큰 순). 없으면 빈 dict."""
+    p = ROOT / "data" / "raw" / "photos.json"
+    return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+
+
 def build_mountains():
     idx = gw_index()
+    photo_db = load_photos()
     res = []
     for m in items("mountains"):
         courses = parse_courses(m.get("etccourse", ""))
@@ -109,8 +116,14 @@ def build_mountains():
             photo = g["mntnattchimageseq"].replace("http://", "https://", 1)
         admin = strip_tags(g.get("mntninfomngmemnbdnm", "")) if g else ""
         admin_tel = strip_tags(g.get("mntninfomangrtlno", "")) if g else ""
+        # 사진 최대 3장: 산정보 서비스 이미지(큰 순) → 없으면 산 정보 조회_GW 사진
+        code = m.get("mntncd") or m["mntnm"]
+        photos = [c["url"] for c in photo_db.get(code, [])][:3]
+        if not photos and photo:
+            photos = [photo]
         res.append({
-            "photo": photo,  # 결과 화면 전용 (카드에는 넣지 않음: CORS)
+            "photo": photos[0] if photos else "",  # 대표 사진 (기존 화면 코드 호환)
+            "photos": photos,  # 결과 화면 전용 (카드에는 넣지 않음: CORS)
             "admin": " ".join(x for x in (admin, admin_tel) if x),
             "id": m.get("mntncd") or m["mntnm"],
             "name": m["mntnm"],
@@ -153,8 +166,9 @@ if __name__ == "__main__":
         "mountains": len(ms),
         "courses": sum(len(m["courses"]) for m in ms),
         "plants": len(ps),
-        "photos": sum(bool(m["photo"]) for m in ms),
-        "source": ["산림청_명산등산로_GW", "산림청_숲에 사는 식물 정보_GW", "산림청_산 정보 조회_GW"],
+        "photos": sum(len(m["photos"]) for m in ms),
+        "mountainsWithPhoto": sum(bool(m["photos"]) for m in ms),
+        "source": ["산림청_명산등산로_GW", "산림청_숲에 사는 식물 정보_GW", "산림청_산 정보 조회_GW", "산림청_산정보 서비스"],
     }
     (OUT / "stats.json").write_text(json.dumps(stats, ensure_ascii=False, indent=1), encoding="utf-8")
     print(stats)
