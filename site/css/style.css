@@ -1,0 +1,86 @@
+/* 임시 디자인 — 색·글꼴은 :root 토큰만 바꾸면 전체에 반영 */
+:root {
+  --bg: #f4f1ea;
+  --ink: #1d2a22;
+  --muted: #5f6b63;
+  --accent: #2f6b4f;
+  --accent-ink: #ffffff;
+  --line: #d9d3c6;
+  --card-bg: #20382b;
+  --card-ink: #f4f1ea;
+  --card-accent: #b9e3c6;
+  --radius: 14px;
+  font-family: "Pretendard", system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); }
+#app { max-width: 480px; margin: 0 auto; padding: 32px 16px 48px; min-height: 100vh; }
+
+.screen { display: none; }
+.screen.active { display: block; animation: fade .25s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; } }
+
+h1 { font-size: 44px; margin: 4px 0 16px; letter-spacing: -0.02em; }
+h2 { font-size: 26px; margin: 8px 0 20px; line-height: 1.35; letter-spacing: -0.01em; }
+h3 { font-size: 14px; color: var(--muted); margin: 0 0 6px; font-weight: 600; }
+.eyebrow { color: var(--accent); font-weight: 700; margin: 0; }
+.lead { color: var(--muted); line-height: 1.6; margin-bottom: 40px; }
+.stats { color: var(--muted); font-size: 13px; margin-top: 24px; }
+
+button { font: inherit; cursor: pointer; border: 0; border-radius: var(--radius); }
+.primary { background: var(--accent); color: var(--accent-ink); padding: 16px 20px; width: 100%; font-weight: 700; font-size: 17px; }
+.ghost { background: transparent; color: var(--muted); padding: 12px; }
+
+#intro { padding-top: 18vh; }
+
+.progress { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.bar { height: 100%; background: var(--accent); width: 0; transition: width .3s; }
+.qnum { color: var(--muted); font-size: 14px; margin: 24px 0 0; }
+.options { display: grid; gap: 10px; }
+.options button {
+  background: #fff; color: var(--ink); border: 1.5px solid var(--line);
+  padding: 16px 18px; text-align: left; font-size: 16px;
+}
+.options button:hover, .options button:focus-visible { border-color: var(--accent); outline: none; }
+.qfield { font-size: 12px; color: var(--muted); margin-top: 16px; }
+
+.rphoto { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius); margin-bottom: 20px; background: var(--line); }
+.rphoto[hidden] { display: none; }
+#result h2 { font-size: 34px; margin-bottom: 4px; }
+.rsub { color: var(--muted); margin: 0 0 16px; }
+.relaxed { background: #fff6dd; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+.reasons { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 24px; }
+.reasons li { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; font-size: 14px; }
+.reasons b { color: var(--accent); margin-right: 4px; }
+.block { border-top: 1px solid var(--line); padding: 16px 0; }
+.block p { margin: 0; line-height: 1.6; white-space: pre-line; overflow-wrap: anywhere; }
+#ralts { margin: 0; padding-left: 18px; line-height: 1.8; }
+.actions { margin-top: 24px; display: grid; gap: 4px; }
+.source { font-size: 12px; color: var(--muted); text-align: center; margin-top: 16px; }
+
+/* ---------- 스토리 카드 1080×1920 ---------- */
+#cardWrap { position: fixed; left: -99999px; top: 0; }
+#card {
+  width: 1080px; height: 1920px; padding: 140px 100px 120px;
+  background: var(--card-bg); color: var(--card-ink);
+  display: flex; flex-direction: column; font-family: "Pretendard", sans-serif;
+}
+.c-eyebrow { font-size: 40px; color: var(--card-accent); font-weight: 700; margin: 0; }
+.c-type { font-size: 56px; font-weight: 700; margin: 16px 0 0; }
+.c-mid { margin-top: 180px; flex: 1; }
+.c-name { font-size: 160px; font-weight: 800; margin: 0; letter-spacing: -0.03em; line-height: 1.1; }
+.c-sub { font-size: 44px; opacity: .8; margin: 24px 0 72px; line-height: 1.4; }
+.c-reasons { list-style: none; padding: 0; margin: 0; display: grid; gap: 28px; }
+.c-reasons li { font-size: 52px; }
+.c-reasons b { color: var(--card-accent); display: inline-block; width: 150px; font-weight: 600; }
+.c-course { font-size: 36px; opacity: .75; margin-top: 64px; line-height: 1.5; }
+.c-plant { border-top: 2px solid rgba(255,255,255,.25); padding-top: 40px; font-size: 38px; line-height: 1.5; }
+.c-plant b { color: var(--card-accent); }
+.c-foot { font-size: 30px; opacity: .6; margin: 48px 0 0; }
+
+#preview { position: fixed; inset: 0; background: rgba(0,0,0,.8); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
+#preview[hidden] { display: none; }
+.preview-inner { text-align: center; color: #fff; max-width: 360px; }
+.preview-inner img { width: 100%; border-radius: 12px; }
+.preview-inner .ghost { color: #fff; }
