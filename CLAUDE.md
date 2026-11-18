@@ -60,6 +60,7 @@
 - 등산로정보 오퍼레이션명 `getforestspatialdataservice`는 포털 명세로 확인됨. 응답은 mntnnm·mntninfourl·mntnfile(등산로 파일)·mntnimg
 - [x] 11/18 정제 JSON `site/data/{mountains,plants,stats}.json` — 산 95 · 코스 239 · 식물 179 (코스 시간 없는 산 5개 제외)
 - [x] 추천 로직 `site/js/recommend.js` — 1134개 답 조합 전부 결과 나옴, 59%는 완화 없음, 1위 산 73종
+- [x] 11/18 배포: https://anth0ny0412.github.io/mountain-match/ (저장소 github.com/anth0ny0412/mountain-match, 공개). `main`에 `site/` 변경을 push하면 Actions가 자동 배포
 - [x] 화면 시제품 `site/index.html` (질문→결과→카드 1080×1920 저장). 디자인은 :root 토큰·TYPES 이름만 교체하면 됨
 
 ## 스크립트
@@ -78,4 +79,4 @@
 ## 다음 할 일
 1. trailInfoService 승인되면 수집 → 지도 여부 결정 (안 되면 지도 없이 제출, 주의점 9)
 2. 김정헌: 질문 문구·유형 이름·카드 디자인 반영 / 실제 폰에서 카드 저장(iOS·안드로이드) 확인
-3. 11/19 배포(GitHub Pages/Vercel) / 11/20 점검·제출
+3. 11/20 점검·제출 (배포는 11/18 완료)
