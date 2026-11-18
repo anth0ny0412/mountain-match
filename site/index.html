@@ -14,11 +14,20 @@
   <main id="app">
     <!-- 시작 -->
     <section id="intro" class="screen active">
+      <div class="sun" aria-hidden="true"></div>
       <p class="eyebrow">산림청 공공데이터로 찾는</p>
       <h1>나랑 맞는 산</h1>
       <p class="lead">질문 5개에 답하면<br>내 시간·체력·이동수단에 맞는 산과 코스를 골라드려요.</p>
+      <!-- 결과 카드 예시: 실제 데이터에서 2곳을 골라 미니 카드로 -->
+      <div class="fan" id="fan" aria-hidden="true"></div>
       <button class="primary" id="start">시작하기</button>
-      <p class="stats" id="stats"></p>
+      <div class="stats" id="stats"></div>
+      <!-- 겹친 산 능선 배경 -->
+      <svg class="ridges" viewBox="0 0 480 150" preserveAspectRatio="none" aria-hidden="true">
+        <path class="r1" d="M0 150 L0 70 L60 40 L120 75 L190 25 L260 70 L330 35 L400 80 L480 45 L480 150 Z"/>
+        <path class="r2" d="M0 150 L0 95 L80 65 L150 100 L230 60 L310 105 L380 70 L480 100 L480 150 Z"/>
+        <path class="r3" d="M0 150 L0 120 L90 100 L170 125 L260 95 L350 128 L420 108 L480 122 L480 150 Z"/>
+      </svg>
     </section>
 
     <!-- 질문 -->
@@ -68,28 +77,36 @@
       </div>
 
       <div class="block">
-        <h3>추천 코스</h3>
-        <p id="rcourse"></p>
+        <h3>추천 코스 <span class="ctime" id="rctime"></span></h3>
+        <ol class="trail" id="rcourse"></ol>
       </div>
       <div class="block">
         <h3>가는 길</h3>
-        <p id="rtransport"></p>
+        <p class="clamp" id="rtransport"></p>
+        <button class="more" data-for="rtransport" hidden>더 보기</button>
       </div>
       <div class="block">
         <h3>이런 산이에요</h3>
-        <p id="rdetails"></p>
+        <p class="clamp" id="rdetails"></p>
+        <button class="more" data-for="rdetails" hidden>더 보기</button>
       </div>
       <div class="block" id="plantBlock">
         <h3 id="plantTitle"></h3>
         <p id="rplant"></p>
       </div>
 
+      <!-- 저장될 스토리 카드 미리보기 (실제 카드를 축소 복제) -->
+      <button class="cardpeek" id="cardpeek" type="button" aria-label="스토리 카드 저장">
+        <span class="peek-frame"><span class="peek-scale" id="peekScale"></span></span>
+        <span class="peek-text"><b>이 카드가 저장돼요</b><small>인스타 스토리 크기 1080×1920<br>누르면 바로 저장</small></span>
+      </button>
+
       <div class="actions">
         <button class="primary" id="save">스토리 카드 저장</button>
         <button class="secondary" id="share">내 결과 링크 복사</button>
         <button class="ghost" id="retry">다시 하기</button>
       </div>
-      <p class="source">데이터: 산림청_명산등산로, 산림청_산 정보 조회(사진), 산림청_숲에 사는 식물 정보 (공공데이터포털)<br>비교 기준: 롯데월드타워 555m · 한라산 1,947m · 영화 1편 2시간</p>
+      <p class="source">데이터: 산림청_명산등산로, 산림청_산 정보 조회·산정보 서비스(사진), 산림청_숲에 사는 식물 정보 (공공데이터포털)<br>비교 기준: 롯데월드타워 555m · 한라산 1,947m · 영화 1편 2시간</p>
     </section>
   </main>
 
@@ -98,7 +115,7 @@
 
   <!-- 인스타 스토리 카드 (1080×1920, 화면 밖에서 렌더) -->
   <div id="cardWrap" aria-hidden="true">
-    <div id="card" data-theme="기본">
+    <div id="card" class="story-card" data-theme="기본">
       <div class="c-top">
         <p class="c-eyebrow">나랑 맞는 산</p>
         <p class="c-type" id="ctype"></p>

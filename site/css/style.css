@@ -21,7 +21,7 @@
 
 /* 실루엣 색: 결과 화면은 밝은 배경, 카드는 어두운 배경 */
 #result { --sil-fill: var(--accent); --sil-ref: rgba(29, 42, 34, .35); --sil-ink: var(--ink); }
-#card { --sil-fill: var(--card-accent); --sil-ref: rgba(255, 255, 255, .45); --sil-ink: var(--card-ink); }
+.story-card { --sil-fill: var(--card-accent); --sil-ref: rgba(255, 255, 255, .45); --sil-ink: var(--card-ink); }
 
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); }
@@ -36,7 +36,7 @@ h2 { font-size: 26px; margin: 8px 0 20px; line-height: 1.35; letter-spacing: -0.
 h3 { font-size: 14px; color: var(--muted); margin: 0 0 6px; font-weight: 600; }
 .eyebrow { color: var(--accent); font-weight: 700; margin: 0; }
 .lead { color: var(--muted); line-height: 1.6; margin-bottom: 40px; }
-.stats { color: var(--muted); font-size: 13px; margin-top: 24px; }
+
 
 button { font: inherit; cursor: pointer; border: 0; border-radius: var(--radius); }
 .primary { background: var(--accent); color: #fff; padding: 16px 20px; width: 100%; font-weight: 700; font-size: 17px; }
@@ -44,7 +44,7 @@ button { font: inherit; cursor: pointer; border: 0; border-radius: var(--radius)
 .ghost { background: transparent; color: var(--muted); padding: 12px; }
 button:disabled { opacity: .6; }
 
-#intro { padding-top: 18vh; }
+
 
 /* ---------- 1. 등반 진행바 + 남은 산 ---------- */
 .climb { position: relative; height: 90px; margin-top: 4px; }
@@ -107,7 +107,7 @@ button:disabled { opacity: .6; }
 
 /* ---------- 스토리 카드 1080×1920 ---------- */
 #cardWrap { position: fixed; left: -99999px; top: 0; }
-#card {
+.story-card {
   width: 1080px; height: 1920px; padding: 130px 100px 110px;
   background: var(--card-bg); color: var(--card-ink);
   display: flex; flex-direction: column; font-family: "Pretendard", sans-serif;
@@ -168,3 +168,74 @@ button:disabled { opacity: .6; }
 @media (prefers-reduced-motion: reduce) {
   .peak, .options button, .chip, #burst span { animation: none !important; transition: none !important; }
 }
+
+/* ---------- 시작 화면: 능선 배경 · 카드 예시 · 큰 숫자 ---------- */
+#intro { position: relative; min-height: calc(100vh - 80px); padding: 6vh 0 150px; }
+#intro.active { display: flex; flex-direction: column; }
+#intro > * { position: relative; z-index: 1; }
+#intro h1 { font-size: 48px; font-weight: 800; }
+#intro .lead { margin-bottom: 8px; }
+.sun {
+  position: absolute !important; z-index: 0 !important; top: -40px; right: -60px; width: 260px; height: 260px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 196, 120, .55) 0%, rgba(255, 196, 120, .18) 45%, rgba(255, 196, 120, 0) 70%);
+  pointer-events: none;
+}
+.ridges { position: absolute !important; z-index: 0 !important; bottom: -48px; left: calc(50% - 50vw); width: 100vw; height: 190px; pointer-events: none; }
+.ridges .r1 { fill: #c9dccd; }
+.ridges .r2 { fill: #8fb59a; }
+.ridges .r3 { fill: #2f6b4f; }
+
+.fan { height: 260px; margin: 18px 0 22px; display: flex; justify-content: center; align-items: center; }
+.mini {
+  width: 138px; height: 245px; border-radius: 14px; padding: 16px 14px 0; overflow: hidden;
+  background: var(--card-bg); color: var(--card-ink); display: flex; flex-direction: column; gap: 3px;
+  box-shadow: 0 18px 40px rgba(29, 42, 34, .25); position: relative;
+  animation: miniIn .6s ease both;
+}
+.mini:first-child { transform: rotate(-7deg) translateX(14px); }
+.mini:last-child { transform: rotate(6deg) translate(-14px, 10px); animation-delay: .12s; }
+.mini-eye { font-size: 9px; font-weight: 700; color: var(--card-accent); }
+.mini-type { font-size: 11px; font-weight: 700; margin-bottom: 14px; }
+.mini-name { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px; }
+.mini-row { font-size: 11px; }
+.mini-row b { color: var(--card-accent); font-weight: 600; margin-right: 6px; }
+.mini svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 56px; }
+.mini svg path { fill: var(--card-accent); opacity: .85; }
+@keyframes miniIn { from { opacity: 0; translate: 0 16px; } to { opacity: 1; translate: 0 0; } }
+
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
+.stats > div { background: rgba(255, 255, 255, .7); border: 1px solid var(--line); border-radius: 12px; padding: 10px 6px; text-align: center; }
+.stats b { display: block; font-size: 24px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+.stats span { font-size: 12px; color: var(--muted); }
+.stats p { grid-column: 1 / -1; margin: 2px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
+
+/* ---------- 결과: 코스 단계 · 접기 · 카드 미리보기 ---------- */
+.ctime { float: right; color: var(--accent); font-weight: 700; }
+.trail { list-style: none; margin: 10px 0 0; padding: 0 0 0 6px; }
+.trail li { position: relative; padding: 0 0 14px 22px; font-size: 15px; display: flex; gap: 8px; align-items: baseline; }
+.trail li::before {
+  content: ""; position: absolute; left: 0; top: 6px; width: 10px; height: 10px; border-radius: 50%;
+  background: #fff; border: 2px solid var(--accent); box-sizing: border-box;
+}
+.trail li::after { content: ""; position: absolute; left: 4px; top: 18px; bottom: 2px; border-left: 2px dashed var(--line); }
+.trail li:last-child { padding-bottom: 0; }
+.trail li:last-child::after { display: none; }
+.trail li.start::before, .trail li.end::before { background: var(--accent); }
+.trail li.top { font-weight: 700; color: var(--accent); }
+.trail li.top::before { content: "▲"; border: 0; background: none; color: var(--accent); font-size: 12px; top: 1px; left: -1px; width: auto; height: auto; }
+.trail em { font-style: normal; font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 1px 6px; }
+
+.block p.clamp:not(.open) { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.more { background: none; color: var(--accent); font-weight: 700; font-size: 14px; padding: 6px 0 0; }
+
+.cardpeek {
+  width: 100%; margin-top: 20px; display: flex; align-items: center; gap: 16px; text-align: left;
+  background: var(--accent-soft); padding: 14px; border-radius: var(--radius);
+}
+.peek-frame { flex: none; width: 108px; height: 192px; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 20px rgba(0, 0, 0, .2); transform: rotate(-3deg); transition: transform .2s; }
+.peek-scale { display: block; width: 1080px; height: 1920px; transform: scale(.1); transform-origin: 0 0; }
+.cardpeek:hover .peek-frame { transform: rotate(0) scale(1.04); }
+.peek-text b { display: block; font-size: 17px; color: var(--ink); margin-bottom: 4px; }
+.peek-text small { color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+@media (prefers-reduced-motion: reduce) { .mini { animation: none !important; } }

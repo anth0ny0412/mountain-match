@@ -33,8 +33,68 @@
       ["mountains", "plants", "stats"].map((n) => fetch(`data/${n}.json`).then((r) => r.json()))
     );
     state.mountains = m; state.plants = p;
-    $("stats").textContent = `명산 ${s.mountains}곳 · 코스 ${s.courses}개 · 숲 식물 ${s.plants}종 데이터로 추천`;
+    $("stats").innerHTML = [[s.mountains, "명산"], [s.courses, "코스"], [s.plants, "숲 식물"]]
+      .map(([n, k]) => `<div><b>${n}</b><span>${k}</span></div>`).join("") +
+      `<p>산림청 공공데이터로 추천해요</p>`;
     buildRange();
+    buildFan();
+  }
+
+  // ---------- 시작 화면 카드 예시: 데이터에서 풍경이 다른 산 2곳 ----------
+  function buildFan() {
+    const pick = (mood, cond) => state.mountains
+      .filter((m) => (m.moods[mood] || 0) > 0 && cond(m))
+      .sort((a, b) => (b.moods[mood] || 0) - (a.moods[mood] || 0))[0];
+    const samples = [
+      [pick("계곡", (m) => m.height < 1000), "계곡"],
+      [pick("단풍", (m) => m.height >= 1000), "단풍"],
+    ].filter(([m]) => m);
+    $("fan").innerHTML = samples.map(([m, theme]) => {
+      const c = m.courses[0];
+      const t = R.typeOf(m, c);
+      return `<div class="mini" data-theme="${theme}">
+        <span class="mini-eye">나랑 맞는 산</span>
+        <span class="mini-type">${t.name}</span>
+        <span class="mini-name">${m.name}</span>
+        <span class="mini-row"><b>소요</b>${R.fmtMin(c.minutes)}</span>
+        <span class="mini-row"><b>높이</b>${m.height.toLocaleString()}m</span>
+        <svg viewBox="0 0 100 30" preserveAspectRatio="none"><path d="M0 30 L18 14 L28 18 L45 4 L70 30 Z"/></svg>
+      </div>`;
+    }).join("");
+  }
+
+  // ---------- 결과: 코스를 등산로 단계로 ----------
+  function renderCourse(m, c) {
+    const pts = c.route.split(/\s+-\s+/).map((s) => s.trim()).filter(Boolean);
+    const isTop = (s) => /정상|봉$|봉\(|대$/.test(s) || s.startsWith(m.name.split("(")[0]);
+    $("rctime").textContent = R.fmtMin(c.minutes);
+    $("rcourse").innerHTML = pts.map((s, k) => {
+      const cls = k === 0 ? "start" : k === pts.length - 1 ? "end" : isTop(s) ? "top" : "";
+      const tag = k === 0 ? "<em>출발</em>" : k === pts.length - 1 ? "<em>도착</em>" : "";
+      return `<li class="${cls}"><span>${s}</span>${tag}</li>`;
+    }).join("");
+  }
+
+  // 긴 글은 3줄만 보이고 '더 보기'
+  function setClamp(id) {
+    const p = $(id), btn = document.querySelector(`.more[data-for="${id}"]`);
+    p.classList.add("clamp"); p.classList.remove("open");
+    requestAnimationFrame(() => {
+      btn.hidden = p.scrollHeight <= p.clientHeight + 2;
+      btn.textContent = "더 보기";
+    });
+  }
+
+  // 저장될 카드를 축소 복제해 미리보기 (canvas는 복제 시 비므로 그림을 복사)
+  function renderCardPeek() {
+    const box = $("peekScale");
+    const clone = $("card").cloneNode(true);
+    clone.removeAttribute("id");
+    clone.querySelectorAll("[id]").forEach((el) => el.removeAttribute("id"));
+    const src = $("csil"), dst = clone.querySelector("canvas");
+    if (dst) { dst.width = src.width; dst.height = src.height; dst.getContext("2d").drawImage(src, 0, 0); }
+    box.innerHTML = "";
+    box.appendChild(clone);
   }
 
   // ---------- 산맥: 산 하나 = 삼각형 하나, 크기는 실제 높이(mntheight) ----------
@@ -274,9 +334,11 @@
     $("rcompare").innerHTML = `<li>⛰️ ${cmp.heightText} · 한라산의 ${cmp.hallaPct}%</li><li>⏱️ ${cmp.timeText}</li>`;
     drawSilhouette($("rsil"), m, $("result"), false);
 
-    $("rcourse").textContent = `${c.route}\n(${R.fmtMin(c.minutes)})`;
+    renderCourse(m, c);
     $("rtransport").textContent = m.transport.text;
     $("rdetails").textContent = m.details;
+    setClamp("rtransport");
+    setClamp("rdetails");
 
     const { plant, title } = pickPlant(m.id);
     $("plantTitle").textContent = title;
@@ -290,6 +352,7 @@
     $("ccompare").innerHTML = `${cmp.heightText}<br>${cmp.timeText}`;
     drawSilhouette($("csil"), m, $("card"), true);
     $("cplant").innerHTML = `${title}<br><b>${plant.name}</b> · ${plant.habitat}`;
+    renderCardPeek();
   }
 
   // ---------- 4. 결과 링크 공유 ----------
@@ -367,6 +430,14 @@
   $("back").onclick = () => { if (state.step) { state.step--; delete state.ans[R.QUESTIONS[state.step].id]; renderQ(); } };
   $("retry").onclick = () => { history.replaceState(null, "", location.pathname); show("intro"); };
   $("save").onclick = saveCard;
+  $("cardpeek").onclick = saveCard;
+  document.querySelectorAll(".more").forEach((btn) => {
+    btn.onclick = () => {
+      const p = $(btn.dataset.for);
+      const open = p.classList.toggle("open");
+      btn.textContent = open ? "접기" : "더 보기";
+    };
+  });
   $("share").onclick = shareLink;
   $("closePreview").onclick = () => { $("preview").hidden = true; };
   load().then(fromHash).catch(() => { $("stats").textContent = "데이터를 불러오지 못했어요. 새로고침 해주세요."; });
