@@ -61,13 +61,14 @@
 - [x] 11/18 정제 JSON `site/data/{mountains,plants,stats}.json` — 산 95 · 코스 239 · 식물 179 (코스 시간 없는 산 5개 제외)
 - [x] 추천 로직 `site/js/recommend.js` — 1134개 답 조합 전부 결과 나옴, 59%는 완화 없음, 1위 산 73종
 - [x] 11/18 배포: https://anth0ny0412.github.io/mountain-match/ (저장소 github.com/anth0ny0412/mountain-match, 공개). `main`에 `site/` 변경을 push하면 Actions가 자동 배포
+- [x] 11/18 흥미 요소: ①질문마다 '조건에 맞는 산 N곳'·선택지별 남은 산 수·등반 진행바 ②비유(롯데월드타워 555m·영화 2시간 기준)+한라산 대비 실루엣(canvas) ③풍경별 카드 색 테마(`[data-theme]`) ④1~3위 넘겨보기·결과 링크 공유(`#a=답,…&i=순위`)
 - [x] 화면 시제품 `site/index.html` (질문→결과→카드 1080×1920 저장). 디자인은 :root 토큰·TYPES 이름만 교체하면 됨
 
 ## 스크립트
 - `scripts/probe.py <경로>` 오퍼레이션 테스트 호출 / `scripts/collect.py mountains|plants|trails|mtinfo` raw 수집
 - `scripts/profile.py`, `scripts/analyze.py` 필드 채움률·키워드 분석 (한글 출력은 `python -X utf8`)
 - `scripts/build_json.py` raw → site/data / `node scripts/test_recommend.js` 전체 조합 점검
-- 로컬 확인: `cd site && python -m http.server 8765` → `http://localhost:8765/`, 점검용 `#a=half,mid,rail,수도권,암릉` (`&card` 붙이면 카드만)
+- 로컬 확인: `cd site && python -m http.server 8765` → `http://localhost:8765/`, 점검용 `#a=half,mid,rail,수도권,암릉` (`&card` 붙이면 카드만, `#q=half,mid` 는 3번째 질문 화면)
 
 ## 결정 사항
 - 체력 질문 = 산 높이(<800 / 800~1199 / 1200+). 등산로 API가 오면 난이도로 교체 검토

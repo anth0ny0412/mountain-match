@@ -132,7 +132,34 @@
 
   const fmtMin = (x) => { const h = Math.floor(x / 60), m = x % 60; return `${h ? h + "시간" : ""}${m ? " " + m + "분" : ""}`.trim(); };
 
-  const api = { QUESTIONS, TYPES, recommend, reasons, pickCourse, typeOf, fmtMin };
+  // 지금까지 답한 조건을 모두 만족하는 산 수 (완화 없이)
+  function count(mountains, ans) {
+    const fs = makeFilters(ans);
+    return mountains.filter((m) => fs.every((f) => f.test(m))).length;
+  }
+
+  // 데이터 값을 일상 비유로 (높이·시간은 데이터, 기준값은 아래 상수)
+  const REF = { tower: 555, towerName: "롯데월드타워", halla: 1947, movie: 120 };
+  function compare(m, course) {
+    const towers = Math.round((m.height / REF.tower) * 10) / 10;
+    const movies = Math.round((course.minutes / REF.movie) * 2) / 2; // 0.5편 단위
+    return {
+      towers,
+      movies,
+      hallaPct: Math.round((m.height / REF.halla) * 100),
+      heightText: `${REF.towerName} ${towers}개 높이`,
+      timeText: movies >= 1 ? `영화 ${movies}편 볼 시간` : "영화 한 편보다 짧아요",
+    };
+  }
+
+  // 풍경 답 → 카드 색 테마 (CSS의 [data-theme])
+  function themeOf(ans, m) {
+    if (ans.mood && ans.mood !== "any") return ans.mood;
+    const top = Object.entries(m.moods).sort((a, b) => b[1] - a[1])[0];
+    return top ? top[0] : "기본";
+  }
+
+  const api = { QUESTIONS, TYPES, REF, recommend, reasons, pickCourse, typeOf, fmtMin, count, compare, themeOf };
   if (typeof module !== "undefined") module.exports = api;
   else root.Recommend = api;
 })(this);

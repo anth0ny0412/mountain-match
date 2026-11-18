@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>나랑 맞는 산 찾기</title>
   <meta name="description" content="내 시간·체력·이동수단에 맞는 산과 코스를 산림청 공공데이터로 추천해요.">
+  <meta property="og:title" content="나랑 맞는 산 찾기">
+  <meta property="og:description" content="질문 5개로 찾는 나의 산 — 산림청 공공데이터 기반 추천">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <link rel="stylesheet" href="css/style.css">
 </head>
@@ -21,7 +23,16 @@
 
     <!-- 질문 -->
     <section id="quiz" class="screen">
-      <div class="progress"><div class="bar" id="bar"></div></div>
+      <!-- 등반 진행바: 질문마다 한 칸씩 올라가 마지막에 정상 -->
+      <div class="climb" aria-hidden="true">
+        <svg viewBox="0 0 320 90" preserveAspectRatio="none">
+          <path class="climb-ridge" d="M0 90 L60 70 L110 78 L170 45 L215 55 L270 12 L320 40 L320 90 Z"/>
+          <polyline class="climb-trail" id="trail" pathLength="1" points="10,86 70,70 130,72 180,48 230,50 270,14"/>
+        </svg>
+        <span class="climber" id="climber">🥾</span>
+        <span class="summit">🚩</span>
+      </div>
+      <p class="remain" id="remain"></p>
       <p class="qnum" id="qnum"></p>
       <h2 id="qtitle"></h2>
       <div class="options" id="options"></div>
@@ -31,6 +42,7 @@
 
     <!-- 결과 -->
     <section id="result" class="screen">
+      <div class="pager" id="pager"></div>
       <img id="rphoto" class="rphoto" alt="" hidden referrerpolicy="no-referrer">
       <p class="eyebrow" id="rtype"></p>
       <h2 id="rname"></h2>
@@ -38,6 +50,11 @@
       <p class="relaxed" id="relaxed" hidden></p>
 
       <ul class="reasons" id="rreasons"></ul>
+
+      <div class="compare">
+        <canvas id="rsil" width="600" height="220"></canvas>
+        <ul id="rcompare"></ul>
+      </div>
 
       <div class="block">
         <h3>추천 코스</h3>
@@ -55,22 +72,21 @@
         <h3 id="plantTitle"></h3>
         <p id="rplant"></p>
       </div>
-      <div class="block" id="altBlock">
-        <h3>이런 산도 맞아요</h3>
-        <ul id="ralts"></ul>
-      </div>
 
       <div class="actions">
         <button class="primary" id="save">스토리 카드 저장</button>
+        <button class="secondary" id="share">내 결과 링크 복사</button>
         <button class="ghost" id="retry">다시 하기</button>
       </div>
-      <p class="source">데이터: 산림청_명산등산로, 산림청_산 정보 조회(사진), 산림청_숲에 사는 식물 정보 (공공데이터포털)</p>
+      <p class="source">데이터: 산림청_명산등산로, 산림청_산 정보 조회(사진), 산림청_숲에 사는 식물 정보 (공공데이터포털)<br>비교 기준: 롯데월드타워 555m · 한라산 1,947m · 영화 1편 2시간</p>
     </section>
   </main>
 
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
   <!-- 인스타 스토리 카드 (1080×1920, 화면 밖에서 렌더) -->
   <div id="cardWrap" aria-hidden="true">
-    <div id="card">
+    <div id="card" data-theme="기본">
       <div class="c-top">
         <p class="c-eyebrow">나랑 맞는 산</p>
         <p class="c-type" id="ctype"></p>
@@ -79,7 +95,10 @@
         <p class="c-name" id="cname"></p>
         <p class="c-sub" id="csub"></p>
         <ul class="c-reasons" id="creasons"></ul>
-        <p class="c-course" id="ccourse"></p>
+      </div>
+      <div class="c-compare">
+        <canvas id="csil" width="880" height="300"></canvas>
+        <p id="ccompare"></p>
       </div>
       <div class="c-plant" id="cplant"></div>
       <p class="c-foot">산림청 공공데이터로 찾은 나의 산</p>
