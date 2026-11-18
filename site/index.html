@@ -33,11 +33,19 @@
         <span class="summit">🚩</span>
       </div>
       <p class="remain" id="remain"></p>
+      <div class="range" id="range" aria-hidden="true"></div>
       <p class="qnum" id="qnum"></p>
       <h2 id="qtitle"></h2>
       <div class="options" id="options"></div>
       <p class="qfield" id="qfield"></p>
       <button class="ghost" id="back">← 이전</button>
+    </section>
+
+    <!-- 추첨 연출 -->
+    <section id="reveal" class="screen">
+      <p class="eyebrow">정상 도착!</p>
+      <h2 id="rcount"></h2>
+      <div class="chips" id="rchips"></div>
     </section>
 
     <!-- 결과 -->
@@ -83,6 +91,7 @@
   </main>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div id="burst" aria-hidden="true"></div>
 
   <!-- 인스타 스토리 카드 (1080×1920, 화면 밖에서 렌더) -->
   <div id="cardWrap" aria-hidden="true">
