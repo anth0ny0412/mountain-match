@@ -77,8 +77,10 @@ button:disabled { opacity: .6; }
 .pager { display: flex; gap: 6px; margin-bottom: 16px; overflow-x: auto; }
 .pager button { background: #fff; border: 1.5px solid var(--line); color: var(--muted); padding: 8px 12px; font-size: 14px; white-space: nowrap; border-radius: 999px; }
 .pager button.on { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 700; }
-.rphoto { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: var(--radius); margin-bottom: 20px; background: var(--line); }
-.rphoto[hidden] { display: none; }
+.photo { position: relative; aspect-ratio: 4 / 3; border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; background: var(--accent-soft); display: flex; align-items: center; justify-content: center; }
+.photo[hidden] { display: none; }
+.photo .bg { position: absolute; inset: -24px; width: calc(100% + 48px); height: calc(100% + 48px); object-fit: cover; filter: blur(22px) saturate(1.15); opacity: .75; }
+.rphoto { position: relative; max-width: 86%; max-height: 86%; object-fit: contain; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
 #result h2 { font-size: 34px; margin-bottom: 4px; }
 .rsub { color: var(--muted); margin: 0 0 16px; }
 .relaxed { background: #fff6dd; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
