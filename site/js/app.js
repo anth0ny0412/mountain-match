@@ -254,10 +254,12 @@
       .join("");
     $("pager").querySelectorAll("button").forEach((b) => { b.onclick = () => { renderResult(+b.dataset.k); window.scrollTo(0, 0); }; });
 
-    const ph = $("rphoto");
-    ph.hidden = !m.photo;
-    ph.onerror = () => { ph.hidden = true; };
-    if (m.photo) { ph.src = m.photo; ph.alt = `${m.name} 사진`; }
+    // 원본 사진이 250px 안팎이라 크게 늘리면 흐려진다 → 흐린 배경 위에 원본에 가까운 크기로 표시
+    const wrap = $("rphotoWrap"), ph = $("rphoto"), bg = $("rphotoBg");
+    wrap.hidden = !m.photo;
+    ph.onerror = () => { wrap.hidden = true; };
+    ph.onload = () => { ph.style.width = `${Math.round(ph.naturalWidth * 1.3)}px`; };
+    if (m.photo) { ph.style.width = ""; ph.src = m.photo; bg.src = m.photo; ph.alt = `${m.name} 사진`; }
 
     $("rtype").textContent = type.name;
     $("rname").textContent = m.name;
