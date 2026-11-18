@@ -130,3 +130,39 @@ button:disabled { opacity: .6; }
 .preview-inner { text-align: center; color: #fff; max-width: 360px; }
 .preview-inner img { width: 100%; border-radius: 12px; }
 .preview-inner .ghost { color: #fff; }
+
+/* ---------- 산맥 · 선택지 아이콘 · 추첨 연출 ---------- */
+.range { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 2px 1px; margin: 10px 0 2px; }
+.peak {
+  --h: .5; width: calc(6px + var(--h) * 9px); height: calc(6px + var(--h) * 20px);
+  background: var(--accent); clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  transition: opacity .35s, transform .35s, background .35s;
+}
+.peak.off { opacity: .15; transform: scaleY(.6); transform-origin: bottom; background: var(--muted); }
+
+.options button { justify-content: flex-start; animation: optIn .35s ease both; animation-delay: calc(var(--i, 0) * 45ms); transition: transform .15s, border-color .15s, background .15s; }
+.options button .ico { font-size: 22px; width: 28px; text-align: center; transition: transform .3s; }
+.options button .lbl { flex: 1; }
+.options button:hover .ico { transform: scale(1.18) rotate(-6deg); }
+.options button:active { transform: scale(.98); }
+.options button.picked { background: var(--accent); border-color: var(--accent); color: #fff; }
+.options button.picked small { color: #fff; }
+.options button.picked .ico { animation: pop .4s ease; }
+.options.locked { pointer-events: none; }
+.options.locked button:not(.picked) { opacity: .45; }
+@keyframes optIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes pop { 50% { transform: scale(1.5) rotate(10deg); } }
+
+#reveal { padding-top: 14vh; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: #fff; border: 1.5px solid var(--line); border-radius: 999px; padding: 8px 14px; font-size: 15px; transition: all .12s; }
+.chip.hot, .chip.win { background: var(--accent); color: #fff; border-color: var(--accent); transform: scale(1.08); }
+.chip.win { transform: scale(1.25); box-shadow: 0 0 0 6px var(--accent-soft); }
+
+#burst { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 5; }
+#burst span { position: absolute; top: -40px; font-size: 26px; animation: fall 2.2s ease-in forwards; }
+@keyframes fall { to { transform: translate(var(--dx), 105vh) rotate(360deg); opacity: .2; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .peak, .options button, .chip, #burst span { animation: none !important; transition: none !important; }
+}
