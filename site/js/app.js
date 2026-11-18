@@ -3,6 +3,17 @@
   const R = window.Recommend;
   const $ = (id) => document.getElementById(id);
   const state = { step: 0, ans: {}, mountains: [], plants: [], out: null, idx: 0, shown: 0 };
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  // 선택지 아이콘 (화면 장식용, 추천에는 영향 없음)
+  const ICONS = {
+    time: { short: "🍃", half: "🌤️", long: "🏕️" },
+    fitness: { low: "🐢", mid: "🚶", high: "🧗" },
+    move: { rail: "🚆", bus: "🚌", car: "🚗" },
+    region: { 수도권: "🏙️", 강원: "🌲", 충청: "🌾", 영남: "🏯", 호남: "🍵", 제주: "🍊", any: "🧭" },
+    mood: { 계곡: "💦", 암릉: "🪨", 조망: "🌅", 꽃: "🌸", 단풍: "🍁", any: "🎲" },
+  };
 
   function show(id) {
     document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("active", s.id === id));
@@ -23,6 +34,26 @@
     );
     state.mountains = m; state.plants = p;
     $("stats").textContent = `명산 ${s.mountains}곳 · 코스 ${s.courses}개 · 숲 식물 ${s.plants}종 데이터로 추천`;
+    buildRange();
+  }
+
+  // ---------- 산맥: 산 하나 = 삼각형 하나, 크기는 실제 높이(mntheight) ----------
+  function buildRange() {
+    const hs = state.mountains.map((m) => m.height), lo = Math.min(...hs), hi = Math.max(...hs);
+    const box = $("range");
+    box.innerHTML = "";
+    state.mountains.forEach((m) => {
+      const el = document.createElement("i");
+      el.className = "peak";
+      el.dataset.id = m.id;
+      el.style.setProperty("--h", (0.35 + 0.65 * (m.height - lo) / (hi - lo)).toFixed(3));
+      box.appendChild(el);
+    });
+  }
+  // 이 답 조합에서 조건을 하나도 빼지 않고 남는 산만 진하게
+  function paintRange(ans) {
+    const keep = new Set(state.mountains.filter((m) => R.count([m], ans) === 1).map((m) => m.id));
+    $("range").querySelectorAll(".peak").forEach((el) => el.classList.toggle("off", !keep.has(el.dataset.id)));
   }
 
   // ---------- 1. 질문: 남은 산 수 + 등반 진행바 ----------
@@ -63,14 +94,29 @@
     $("qtitle").textContent = q.title;
     $("qfield").textContent = `사용 데이터: ${q.field}`;
     $("back").style.visibility = state.step ? "visible" : "hidden";
+    paintRange(state.ans);
     const box = $("options");
     box.innerHTML = "";
-    q.options.forEach((o) => {
-      const n = R.count(state.mountains, { ...state.ans, [q.id]: o.v });
+    q.options.forEach((o, i) => {
+      const next = { ...state.ans, [q.id]: o.v };
+      const n = R.count(state.mountains, next);
       const b = document.createElement("button");
-      b.innerHTML = `<span>${o.label}</span><small>${n ? n + "곳" : "가까운 산 추천"}</small>`;
-      b.onclick = () => {
+      b.style.setProperty("--i", i);
+      b.innerHTML = `<span class="ico">${(ICONS[q.id] || {})[o.v] || "⛰️"}</span><span class="lbl">${o.label}</span><small>${n ? n + "곳" : "가까운 산 추천"}</small>`;
+      // 고르기 전 미리보기: 이 답을 고르면 산맥이 어떻게 줄어드는지
+      const preview = () => paintRange(next);
+      const reset = () => paintRange(state.ans);
+      b.addEventListener("pointerenter", preview);
+      b.addEventListener("focus", preview);
+      b.addEventListener("pointerleave", reset);
+      b.addEventListener("blur", reset);
+      b.onclick = async () => {
         state.ans[q.id] = o.v;
+        b.classList.add("picked");
+        box.classList.add("locked");
+        paintRange(state.ans);
+        await sleep(reduceMotion ? 0 : 380);
+        box.classList.remove("locked");
         if (state.step < R.QUESTIONS.length - 1) { state.step++; renderQ(); }
         else finish();
       };
@@ -78,10 +124,50 @@
     });
   }
 
-  function finish() {
+  // 정상 도착 → 후보 이름 사이를 돌다가 1위에서 멈추는 추첨 연출 → 결과
+  async function finish() {
     moveClimber(TRAIL.length - 1);
     animateNumber($("remain"), R.count(state.mountains, state.ans));
-    setTimeout(() => showResult(0), 500); // 정상 도착을 잠깐 보여준 뒤 결과
+    await sleep(reduceMotion ? 0 : 500);
+    const all = R.recommend(state.mountains, state.ans, 30);
+    const names = all.results.map((r) => r.mountain.name);
+    $("rcount").textContent = all.relaxed.length
+      ? `조건을 조금 풀어서 ${all.total}곳 중에서 고르는 중…`
+      : `${all.total}곳 중에서 나랑 가장 맞는 산 고르는 중…`;
+    $("rchips").innerHTML = names.map((n) => `<span class="chip">${n}</span>`).join("");
+    show("reveal");
+    const chips = [...$("rchips").children];
+    if (!reduceMotion && chips.length > 1) {
+      let k = 0;
+      const steps = Math.min(18, 8 + chips.length);
+      for (let s = 0; s < steps; s++) {
+        chips.forEach((c) => c.classList.remove("hot"));
+        k = (k + 1 + Math.floor(Math.random() * (chips.length - 1))) % chips.length;
+        chips[k].classList.add("hot");
+        await sleep(60 + s * s * 2.2);
+      }
+    }
+    chips.forEach((c) => c.classList.remove("hot"));
+    if (chips[0]) chips[0].classList.add("win");
+    await sleep(reduceMotion ? 0 : 650);
+    showResult(0);
+    if (!reduceMotion) burst();
+  }
+
+  // 결과 화면 진입 효과 (나뭇잎)
+  function burst() {
+    const layer = $("burst");
+    layer.innerHTML = "";
+    const leaves = ["🍃", "🌿", "🍂", "🌱"];
+    for (let k = 0; k < 18; k++) {
+      const el = document.createElement("span");
+      el.textContent = leaves[k % leaves.length];
+      el.style.left = Math.random() * 100 + "%";
+      el.style.animationDelay = (Math.random() * 0.5).toFixed(2) + "s";
+      el.style.setProperty("--dx", (Math.random() * 80 - 40).toFixed(0) + "px");
+      layer.appendChild(el);
+    }
+    setTimeout(() => { layer.innerHTML = ""; }, 2600);
   }
 
   // ---------- 식물: 산과 연결 필드가 없어 "이 계절 숲" 기준 ----------
